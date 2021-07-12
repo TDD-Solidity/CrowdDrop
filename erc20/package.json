@@ -1,0 +1,23 @@
+{
+  "name": "crowddrop",
+  "version": "1.0.0",
+  "description": "A simple airdrop smart contract",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TDD-Solidity/CrowdDrop.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TDD-Solidity/CrowdDrop/issues"
+  },
+  "homepage": "https://github.com/TDD-Solidity/CrowdDrop#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.2.0",
+    "nodemon": "^2.0.12"
+  }
+}
