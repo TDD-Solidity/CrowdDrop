@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "./AdminsManager.sol";
+import "./RecipientsManager.sol";
 import "./Roles.sol";
 
-contract ContributorManager is AdminsManager {
+contract ContributorManager is RecipientsManager {
     using Roles for Roles.Role;
 
     event ContributorAdded(address indexed account, uint256 groupId);
