@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "../core/CrowdDropBase_Eth.sol";
-import "./AdminsManager.sol";
+import "../core/__CrowdDropBase_Eth.sol";
+import "./___AdminsManager.sol";
 import "./ContributorManager.sol";
 import "./Roles.sol";
 
@@ -31,7 +31,7 @@ contract AdminsManager is CrowdDropBase_Eth {
         return currentEvents[groupId].admins.has(account);
     }
 
-    modifier onlyAdminsOrCOO(uint groupId) {
+    modifier onlyAdminsOrCOO(uint256 groupId) {
         require(isAdmin(msg.sender, groupId) || msg.sender == cooAddress);
         _;
     }
@@ -67,14 +67,9 @@ contract AdminsManager is CrowdDropBase_Eth {
     //   return events[groupId].contributors;
     // }
 
-    // not paused!
+    function createNewGroup() public onlyCOO whenNotPaused {
+        uint256 newGroupId = uint256(block.blockhash(block.number));
 
-    function createNewGroup() public onlyCOO {
-        
-        // TODO - set startTime
-
-        uint newGroupId = uint256(block.blockhash(block.number));
-        
         CrowdDropEvent memory newGroup = CrowdDropEvent(
             newGroupId,
             EventState.CREATED,
@@ -96,30 +91,65 @@ contract AdminsManager is CrowdDropBase_Eth {
         emit EventStarted();
     }
 
-    function startEvent(uint groupId) public onlyCOO {
-        
-        // TODO - set startTime
-        
+    function startEvent(uint256 groupId)
+        public
+        onlyAdmins(groupId)
+        whenNotPaused
+    {
+        currentEvents[groupId].state = EventState.CREATED;
+        currentEvents[groupId].startTime = block.timestamp;
+
         emit EventStarted();
     }
 
-    function closeEventRegistration(uint groupId) public onlyAdmins(groupId) {
-    
-        // TODO - set registrationEndTime
-
+    function closeEventRegistration(uint256 groupId)
+        public
+        onlyAdmins(groupId)
+        whenNotPaused
+    {
+        currentEvents[groupId].registrationEndTime = block.timestamp;
         currentEvents[groupId].currentState = EventState.CLAIM_WINNINGS;
 
-        // build a PaymentSplitter, passing arrays of registered recipients and shares 
+        uint256 potShares = [];
+
+        uint256 baseUnit = 100;
+
+        for (i; i < registeredRecipientsCount; i++) {
+            potShares.push(baseUnit);
+        }
+
+        // Calculate shares for dev team cut.
+        uint256 devFeePercentage = 5;
+        uint256 devTeamShares = (baseUnit * registeredRecipientsCount) /
+            (1 - (devFeePercentage / 100));
+
+        // Add dev cut to payout recipients.
+        currentEvents[groupId].registeredRecipientsArray.push(cfoAddress);
+        potShares.push(devTeamShares);
+
+        // Build pot
+        pot = PaymentSplitter(
+            currentEvents[groupId].registeredRecipientsArray,
+            potShares
+        );
+
+        // Transfer dev cut to cfo
+        payable(cfoAddress).transfer(address(this).balance);
+
+        emit CalculatedPot(registeredRecipientsCount, baseUnit, devTeamShares);
 
         emit RegistrationEnded();
     }
 
-    function endEvent(uint groupId) public onlyAdminsOrCOO(groupId) {
-    
-        // TODO - set endTime
+    function endEvent(uint256 groupId)
+        public
+        onlyAdminsOrCOO(groupId)
+        whenNotPaused
+    {
+        currentEvents[groupId].endTime = block.timestamp;
 
         currentEvents[groupId].currentState = EventState.ENDED;
-        
+
         pastEvents[groupId].push(currentEvents[groupId]);
 
         emit EventEnded();

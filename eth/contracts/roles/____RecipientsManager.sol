@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "./AdminsManager.sol";
+import "./___AdminsManager.sol";
 import "./Roles.sol";
 
 abstract contract RecipientsManager is AdminsManager {
@@ -23,6 +23,7 @@ abstract contract RecipientsManager is AdminsManager {
     function isEligibleRecipient(address account, uint256 groupId)
         public
         view
+        whenNotPaused
         returns (bool)
     {
         return events[groupId].eligibleRecipients.has(account);
@@ -36,15 +37,15 @@ abstract contract RecipientsManager is AdminsManager {
     function isRegisteredRecipient(address account, uint256 groupId)
         public
         view
+        whenNotPaused
         returns (bool)
     {
         return events[groupId].registeredRecipients.has(account);
     }
 
-    // not paused!
-
     function addEligibleRecipient(address account, uint256 groupId)
         public
+        whenNotPaused
         onlyAdmins(groupId)
     {
         events[groupId].eligibleRecipients.add(account);
@@ -54,6 +55,7 @@ abstract contract RecipientsManager is AdminsManager {
     function removeEligibleRecipient(address account, uint256 groupId)
         public
         onlyAdmins(groupId)
+        whenNotPaused
     {
         events[groupId].eligibleRecipients.remove(account);
         emit EligibleRecipientRemoved(account, groupId);
@@ -62,6 +64,7 @@ abstract contract RecipientsManager is AdminsManager {
     function registerForEvent(uint256 groupId)
         public
         onlyEligibleRecipients(groupId)
+        whenNotPaused
     {
         events[groupId].registeredRecipients.add(msg.sender);
         emit RecipientRegistered(msg.sender, groupId);
@@ -70,6 +73,7 @@ abstract contract RecipientsManager is AdminsManager {
     function claimWinnings(uint256 groupId)
         public
         onlyRegisteredRecipients(groupId)
+        whenNotPaused
     {
         events[groupId].pot.release();
         emit WinningsClaimed(msg.sender, groupId);

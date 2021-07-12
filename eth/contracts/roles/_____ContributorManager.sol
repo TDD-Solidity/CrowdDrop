@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "./RecipientsManager.sol";
+import "./____RecipientsManager.sol";
 import "./Roles.sol";
 
 contract ContributorManager is RecipientsManager {
@@ -9,8 +9,12 @@ contract ContributorManager is RecipientsManager {
 
     event ContributorAdded(address indexed account, uint256 groupId);
     event ContributorRemoved(address indexed account, uint256 groupId);
-    
-    event ContributionMade(address indexed account, uint256 groupId, uint amount);
+
+    event ContributionMade(
+        address indexed account,
+        uint256 groupId,
+        uint256 amount
+    );
 
     constructor() {}
 
@@ -22,18 +26,24 @@ contract ContributorManager is RecipientsManager {
     function isContributor(address account, uint256 groupId)
         public
         view
+        whenNotPaused
         returns (bool)
     {
         return currentEvents[groupId].contributors.has(account);
     }
 
-    function addContributor(address account, uint256 groupId) public onlyCOO {
+    function addContributor(address account, uint256 groupId)
+        public
+        onlyCOO
+        whenNotPaused
+    {
         _addContributor(account, groupId);
     }
 
     function removeContributor(address account, uint256 groupId)
         public
         onlyCOO
+        whenNotPaused
     {
         _removeContributor(account, groupId);
     }
@@ -41,11 +51,10 @@ contract ContributorManager is RecipientsManager {
     function renounceContributor(uint256 groupId)
         public
         onlyContributor(groupId)
+        whenNotPaused
     {
         _removeContributor(msg.sender, groupId);
     }
-
-    // not paused!
 
     function _addContributor(address account, uint256 groupId) internal {
         currentEvents[groupId].admins.add(account);
@@ -57,8 +66,12 @@ contract ContributorManager is RecipientsManager {
         emit ContributorRemoved(account, groupId);
     }
 
-    function contributeToPot(uint groupId) public payable onlyContributor(groupId) {
+    function contributeToPot(uint256 groupId)
+        public
+        payable
+        onlyContributor(groupId)
+        whenNotPaused
+    {
         emit ContributionMade(msg.sender, groupId, msg.value);
     }
-
 }
