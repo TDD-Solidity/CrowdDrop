@@ -2,8 +2,6 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 import "../core/__CrowdDropBase_Eth.sol";
-import "./___AdminsManager.sol";
-import "./ContributorManager.sol";
 import "./Roles.sol";
 
 contract AdminsManager is CrowdDropBase_Eth {
@@ -15,6 +13,11 @@ contract AdminsManager is CrowdDropBase_Eth {
     event EventStarted(address indexed account, uint256 groupId);
     event RegistrationEnded(address indexed account, uint256 groupId);
     event EventEnded(address indexed account, uint256 groupId);
+
+    event CalculatedPot(
+        uint256 registeredRecipientCount,
+        uint256 winningsPerRecipient
+    );
 
     constructor() {}
 
@@ -96,7 +99,7 @@ contract AdminsManager is CrowdDropBase_Eth {
         onlyAdmins(groupId)
         whenNotPaused
     {
-        currentEvents[groupId].state = EventState.CREATED;
+        currentEvents[groupId].state = EventState.REGISTRATION;
         currentEvents[groupId].startTime = block.timestamp;
 
         emit EventStarted();
@@ -108,35 +111,31 @@ contract AdminsManager is CrowdDropBase_Eth {
         whenNotPaused
     {
         currentEvents[groupId].registrationEndTime = block.timestamp;
-        currentEvents[groupId].currentState = EventState.CLAIM_WINNINGS;
+
+        // Transfer dev cut to cfo
+        payable(cfoAddress).transfer(address(this).balance * 0.05);
 
         uint256 potShares = [];
 
-        uint256 baseUnit = 100;
-
-        for (i; i < registeredRecipientsCount; i++) {
-            potShares.push(baseUnit);
+        for (uint256 i; i < currentEvents[groupId].registeredRecipientsCount; i++) {
+            potShares.push(1);
         }
 
-        // Calculate shares for dev team cut.
-        uint256 devFeePercentage = 5;
-        uint256 devTeamShares = (baseUnit * registeredRecipientsCount) /
-            (1 - (devFeePercentage / 100));
-
-        // Add dev cut to payout recipients.
-        currentEvents[groupId].registeredRecipientsArray.push(cfoAddress);
-        potShares.push(devTeamShares);
-
         // Build pot
-        pot = PaymentSplitter(
+        PaymentSplitter pot = PaymentSplitter(
             currentEvents[groupId].registeredRecipientsArray,
             potShares
         );
 
-        // Transfer dev cut to cfo
-        payable(cfoAddress).transfer(address(this).balance);
+        currentEvents[groupId].currentState = EventState.CLAIM_WINNINGS;
 
-        emit CalculatedPot(registeredRecipientsCount, baseUnit, devTeamShares);
+        uint256 winningsPerRecipient = address(this).balance /
+            pot.totalShares();
+
+        emit CalculatedPot(
+            currentEvents[groupId].registeredRecipientsCount,
+            winningsPerRecipient
+        );
 
         emit RegistrationEnded();
     }

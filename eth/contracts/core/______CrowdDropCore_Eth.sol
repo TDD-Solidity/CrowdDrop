@@ -8,7 +8,7 @@ contract CrowdDropCore_Eth is ContributorManager {
     address public newContractAddress;
 
     /// @notice Creates the main CrowdDrop smart contract instance.
-    function CrowdDropCore_Eth() public {
+    constructor () {
         // Starts paused.
         paused = true;
 

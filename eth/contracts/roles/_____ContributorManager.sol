@@ -34,7 +34,7 @@ contract ContributorManager is RecipientsManager {
 
     function addContributor(address account, uint256 groupId)
         public
-        onlyCOO
+        onlyAdminsOrCOO(groupId)
         whenNotPaused
     {
         _addContributor(account, groupId);
@@ -42,7 +42,7 @@ contract ContributorManager is RecipientsManager {
 
     function removeContributor(address account, uint256 groupId)
         public
-        onlyCOO
+        onlyAdminsOrCOO(groupId)
         whenNotPaused
     {
         _removeContributor(account, groupId);

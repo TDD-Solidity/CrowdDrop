@@ -10,7 +10,7 @@ contract ExecutivesAccessControl {
     //
     //     - The CFO: The CFO controls the wallet that payments to the "dev wallet" go to.
     //
-    //     - The COO: The COO can create new events and assign Admins to events. The COO can forcibly end any
+    //     - The COO: The COO can create new groups and assign Admins to groups. The COO can forcibly end any
     //         currently running event. The COO can also view information about previously run events.
     //
     //

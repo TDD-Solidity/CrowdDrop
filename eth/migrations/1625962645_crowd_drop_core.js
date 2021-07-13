@@ -1,3 +1,5 @@
-module.exports = function(_deployer) {
-  // Use deployer to state migration tasks.
+const CrowdDropCore_Eth = artifacts.require("CrowdDropCore_Eth");
+
+module.exports = function (deployer) {
+  deployer.deploy(CrowdDropCore_Eth);
 };
