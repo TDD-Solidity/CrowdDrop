@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "../roles/_____ContributorManager.sol";
+import "../roles/AdminsManager.sol";
 
-contract CrowdDropCore_Eth is ContributorManager {
+contract CrowdDropCore is AdminsManager {
     // Set in case the core contract is broken and an upgrade is required
     address public newContractAddress;
 

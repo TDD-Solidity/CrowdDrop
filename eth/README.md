@@ -1,2 +1,79 @@
 # CrowdDrop
 A simple airdrop smart contract
+
+<br/>
+<br/>
+
+
+## Inheritance
+<br/>
+
+The inheritance structure is, admittedly, kind of confusing. 
+
+The structure is inspired by the [CryptoKitties source code](https://ethfiddle.com/09YbyJRfiI), and the inheritance is to me just a fancy way of importing functions and variables that you can read or write from other files...
+
+Here is the full inheritance chain. It all starts with "ExecutivesAccessControl", and each contract below it inherits from the one above it.
+
+<br/>
+<br/>
+
+##  ExecutiesAccessControl
+    - sets up the "ceo, coo, and cfo" (the all-power contract admins) addresses and modifiers.
+
+    ⬇️
+
+<br/>
+
+## CrowdDropBase
+    - sets up the core struct for a "CrowdDropEvent" and mapping of events.
+
+    ⬇️
+
+<br/>
+
+## RecipientsManager
+    - holds recipients only modifiers and functions for recipients to call, such as "registerForEvent" and "claimWinnings"
+
+    ⬇️
+
+<br/>
+
+## ContributorManager
+    - holds contributor only modifier and a function for contributor to call, "contributeToPot"
+
+    ⬇️
+
+<br/>
+
+## AdminsManager
+    - functions for assigning admins (called by coo), and functions for admins to call: "add / remove contributor", "add / remove elgible recipients", "start / stop event", "end registration"...
+
+    ⬇️
+
+<br/>
+
+## CrowdDropCore
+    - The only contract meant to be called by the outside world (eg. a javascript frontend using web3). This contract inherits everything from the previous contracts and exposes a single function allowing the ceo to upgrade the contract. 
+
+
+<br/>
+<br/>
+<br/>
+
+## Remix Usage Guide
+
+Here's a short guide on how to deploy this contract and play with it on remix!
+
+<br/>
+
+### Step 1 - Create a build from the source code.
+
+cd into the "eth" folder of this repo.
+
+Then run:
+```
+
+```
+
+
+### Step 1 - Deploy to your desired Testnet

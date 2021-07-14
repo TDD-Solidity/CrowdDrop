@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "../core/__CrowdDropBase_Eth.sol";
+import "./ContributorManager.sol";
 import "./Roles.sol";
 
-contract AdminsManager is CrowdDropBase_Eth {
+contract AdminsManager is ContributorManager {
     using Roles for Roles.Role;
 
     event AdminAdded(address indexed account, uint256 groupId);
@@ -53,22 +53,18 @@ contract AdminsManager is CrowdDropBase_Eth {
     }
 
     function _addAdmin(address account, uint256 groupId) internal {
-        currentEvents[groupId].admins.add(account);
+        admins[groupId].add(account);
         emit AdminAdded(account, groupId);
     }
 
     function _removeAdmin(address account, uint256 groupId) internal {
-        currentEvents[groupId].admins.remove(account);
+        admins[groupId].remove(account);
         emit AdminRemoved(account, groupId);
     }
 
-    // function readEventInfo(uint groupId) public onlyAdmins(groupId) returns (CrowdDropEvent) {
-    //   return events[groupId];
-    // }
-
-    // function readEventContributors(uint groupId) public onlyAdmins(groupId) returns (Roles.Role) {
-    //   return events[groupId].contributors;
-    // }
+    function readEventInfo(uint groupId) public onlyAdmins(groupId) returns (CrowdDropEvent memory) {
+      return currentEvents[groupId];
+    }
 
     function createNewGroup() public onlyCOO whenNotPaused {
         uint256 newGroupId = uint256(block.blockhash(block.number));
@@ -77,12 +73,10 @@ contract AdminsManager is CrowdDropBase_Eth {
             newGroupId,
             EventState.CREATED,
             block.timestamp,
+            block.timestamp,
+            block.timestamp,
             0,
-            0,
-            AdminsManager(),
-            ContributorManager(),
-            RecipientsManager(),
-            RecipientsManager(),
+            "",
             "",
             "",
             "",
@@ -90,6 +84,11 @@ contract AdminsManager is CrowdDropBase_Eth {
         );
 
         currentEvents[newGroupId] = newGroup;
+
+        admins[newGroup] = AdminsManager();
+        contributors[newGroup] = ContributorManager();
+        eligibleRecipients[newGroup] = RecipientsManager();
+        registeredRecipients[newGroup] = RecipientsManager();
 
         emit EventStarted();
     }
@@ -117,13 +116,17 @@ contract AdminsManager is CrowdDropBase_Eth {
 
         uint256 potShares = [];
 
-        for (uint256 i; i < currentEvents[groupId].registeredRecipientsCount; i++) {
+        for (
+            uint256 i;
+            i < currentEvents[groupId].registeredRecipientsCount;
+            i++
+        ) {
             potShares.push(1);
         }
 
         // Build pot
         PaymentSplitter pot = PaymentSplitter(
-            currentEvents[groupId].registeredRecipientsArray,
+            registeredRecipientsArray[groupId],
             potShares
         );
 
@@ -152,5 +155,39 @@ contract AdminsManager is CrowdDropBase_Eth {
         pastEvents[groupId].push(currentEvents[groupId]);
 
         emit EventEnded();
+    }
+
+    function addEligibleRecipient(address account, uint256 groupId)
+        public
+        whenNotPaused
+        onlyAdmins(groupId)
+    {
+        eligibleRecipients[groupId].add(account);
+        emit EligibleRecipientAdded(account, groupId);
+    }
+
+    function removeEligibleRecipient(address account, uint256 groupId)
+        public
+        onlyAdmins(groupId)
+        whenNotPaused
+    {
+        eligibleRecipients[groupId].remove(account);
+        emit EligibleRecipientRemoved(account, groupId);
+    }
+
+    function addContributor(address account, uint256 groupId)
+        public
+        onlyAdminsOrCOO(groupId)
+        whenNotPaused
+    {
+        _addContributor(account, groupId);
+    }
+
+    function removeContributor(address account, uint256 groupId)
+        public
+        onlyAdminsOrCOO(groupId)
+        whenNotPaused
+    {
+        _removeContributor(account, groupId);
     }
 }

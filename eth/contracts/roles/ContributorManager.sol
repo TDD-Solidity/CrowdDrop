@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "./____RecipientsManager.sol";
+import "./RecipientsManager.sol";
 import "./Roles.sol";
 
 contract ContributorManager is RecipientsManager {
@@ -30,22 +30,6 @@ contract ContributorManager is RecipientsManager {
         returns (bool)
     {
         return currentEvents[groupId].contributors.has(account);
-    }
-
-    function addContributor(address account, uint256 groupId)
-        public
-        onlyAdminsOrCOO(groupId)
-        whenNotPaused
-    {
-        _addContributor(account, groupId);
-    }
-
-    function removeContributor(address account, uint256 groupId)
-        public
-        onlyAdminsOrCOO(groupId)
-        whenNotPaused
-    {
-        _removeContributor(account, groupId);
     }
 
     function renounceContributor(uint256 groupId)

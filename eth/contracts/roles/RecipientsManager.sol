@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "./___AdminsManager.sol";
+import "../core/CrowdDropBase.sol";
 import "./Roles.sol";
 
-abstract contract RecipientsManager is AdminsManager {
+contract RecipientsManager is CrowdDropBase {
     using Roles for Roles.Role;
 
     event EligibleRecipientAdded(address indexed account, uint256 groupId);
@@ -26,7 +26,7 @@ abstract contract RecipientsManager is AdminsManager {
         whenNotPaused
         returns (bool)
     {
-        return events[groupId].eligibleRecipients.has(account);
+        return eligibleRecipients[groupId].has(account);
     }
 
     modifier onlyRegisteredRecipients(uint256 groupId) {
@@ -40,25 +40,7 @@ abstract contract RecipientsManager is AdminsManager {
         whenNotPaused
         returns (bool)
     {
-        return events[groupId].registeredRecipients.has(account);
-    }
-
-    function addEligibleRecipient(address account, uint256 groupId)
-        public
-        whenNotPaused
-        onlyAdmins(groupId)
-    {
-        events[groupId].eligibleRecipients.add(account);
-        emit EligibleRecipientAdded(account, groupId);
-    }
-
-    function removeEligibleRecipient(address account, uint256 groupId)
-        public
-        onlyAdmins(groupId)
-        whenNotPaused
-    {
-        events[groupId].eligibleRecipients.remove(account);
-        emit EligibleRecipientRemoved(account, groupId);
+        return registeredRecipients[groupId].has(account);
     }
 
     function registerForEvent(uint256 groupId)
@@ -66,7 +48,7 @@ abstract contract RecipientsManager is AdminsManager {
         onlyEligibleRecipients(groupId)
         whenNotPaused
     {
-        events[groupId].registeredRecipients.add(msg.sender);
+        registeredRecipients[groupId].add(msg.sender);
         emit RecipientRegistered(msg.sender, groupId);
     }
 
@@ -75,7 +57,7 @@ abstract contract RecipientsManager is AdminsManager {
         onlyRegisteredRecipients(groupId)
         whenNotPaused
     {
-        events[groupId].pot.release();
+        currentEvents[groupId].pot.release(payable(msg.sender));
         emit WinningsClaimed(msg.sender, groupId);
     }
 }

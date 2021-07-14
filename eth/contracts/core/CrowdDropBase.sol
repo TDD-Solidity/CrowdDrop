@@ -2,10 +2,10 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 import "../roles/Roles.sol";
-import "../roles/_ExecutivesAccessControl.sol";
+import "../roles/ExecutivesAccessControl.sol";
 import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
 
-contract CrowdDropBase_Eth is ExecutivesAccessControl {
+contract CrowdDropBase is ExecutivesAccessControl {
     /*** EVENTS ***/
 
     /// @dev The RegistrationOpen event is fired whenever a new event starts and users can begin restering.
@@ -53,20 +53,6 @@ contract CrowdDropBase_Eth is ExecutivesAccessControl {
         uint64 registrationEndTime;
         // The timestamp from the block when this event ended.
         uint64 endTime;
-
-        // Keeping track of different types of users and their _roles_
-        Roles.Role admins;
-        Roles.Role contributors;
-        
-        // All recipients must be added into the system once initially 
-        // by an admin
-        Roles.Role eligibleRecipients;
-        
-        // An array (easier to pass into PaymentSplitter)
-        Roles.Role registeredRecipientsArray;
-        
-        // Eligible recipients can register for an ongoing event in the state "registration open".
-        Roles.Role registeredRecipients;
         
         // The number of eligibleRecipients who have registered.
         uint registeredRecipientsCount;
@@ -76,18 +62,41 @@ contract CrowdDropBase_Eth is ExecutivesAccessControl {
         string sponsorImageUrl;
         string sponsorLinkToUrl;
 
+        address currentContributor;
+
         // Keeping track of winnings claimings
         PaymentSplitter pot;
 
     }
 
-    // Events happening now or in the future.
+    // ALL events happening now or in the future.
     // Key is the groupId
     mapping(uint => CrowdDropEvent) currentEvents;
     
-    // Events that have already happened.
+    // ALL events that have already happened.
     // Key is the groupId
     mapping(uint => CrowdDropEvent[]) pastEvents;
+
+    // Holds ALL admins for all groups
+    // groupId => Role 
+    mapping(uint => Roles.Role) admins;
+
+    // Holds ALL contributors for all groups
+    // groupId => Role 
+    mapping(uint => Roles.Role) contributors;
+
+    // Holds ALL eligibleRecipients for all groups
+    // groupId => Role 
+    mapping(uint => Roles.Role) eligibleRecipients;
+
+    // Holds ALL registeredRecipients for all groups
+    // groupId => Role 
+    mapping(uint => Roles.Role) registeredRecipients;
+
+    // Holds ALL registeredRecipients in an array (for PaymentSplitter)
+    // groupId => address[] 
+    mapping(uint => address[]) registeredRecipientsArray;
+
 
     // Any C-level can fix how many seconds per blocks are currently observed.
     // function setSecondsPerBlock(uint256 secs) external onlyCLevel {
