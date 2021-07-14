@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.4.22 <0.9.0;
+ pragma solidity ^0.8.0;
 
 contract ExecutivesAccessControl {
     //  This contract deals with highest level access control for CrowdDrop. There are three roles managed here:

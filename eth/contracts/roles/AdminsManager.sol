@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity ^0.8.0;
 
 import "./ContributorManager.sol";
 import "./Roles.sol";
@@ -10,9 +10,10 @@ contract AdminsManager is ContributorManager {
     event AdminAdded(address indexed account, uint256 groupId);
     event AdminRemoved(address indexed account, uint256 groupId);
 
-    event EventStarted(address indexed account, uint256 groupId);
-    event RegistrationEnded(address indexed account, uint256 groupId);
-    event EventEnded(address indexed account, uint256 groupId);
+    event GroupCreated(address indexed creator, uint256 groupId);
+    event EventStarted(address indexed startedBy, uint256 groupId);
+    event RegistrationEnded(address indexed endedBy, uint256 groupId);
+    event EventEnded(address indexed endedBy, uint256 groupId);
 
     event CalculatedPot(
         uint256 registeredRecipientCount,
@@ -31,7 +32,7 @@ contract AdminsManager is ContributorManager {
         view
         returns (bool)
     {
-        return currentEvents[groupId].admins.has(account);
+        return admins[groupId][account] == true;
     }
 
     modifier onlyAdminsOrCOO(uint256 groupId) {
@@ -53,21 +54,26 @@ contract AdminsManager is ContributorManager {
     }
 
     function _addAdmin(address account, uint256 groupId) internal {
-        admins[groupId].add(account);
+        admins[groupId][account] = true;
         emit AdminAdded(account, groupId);
     }
 
     function _removeAdmin(address account, uint256 groupId) internal {
-        admins[groupId].remove(account);
+        admins[groupId][account] = false;
         emit AdminRemoved(account, groupId);
     }
 
-    function readEventInfo(uint groupId) public onlyAdmins(groupId) returns (CrowdDropEvent memory) {
-      return currentEvents[groupId];
+    function readEventInfo(uint256 groupId)
+        public
+        view
+        onlyAdmins(groupId)
+        returns (CrowdDropEvent memory)
+    {
+        return currentEvents[groupId];
     }
 
     function createNewGroup() public onlyCOO whenNotPaused {
-        uint256 newGroupId = uint256(block.blockhash(block.number));
+        uint256 newGroupId = uint256(blockhash(block.number));
 
         CrowdDropEvent memory newGroup = CrowdDropEvent(
             newGroupId,
@@ -79,18 +85,12 @@ contract AdminsManager is ContributorManager {
             "",
             "",
             "",
-            "",
-            0
+            address(0)
         );
 
         currentEvents[newGroupId] = newGroup;
 
-        admins[newGroup] = AdminsManager();
-        contributors[newGroup] = ContributorManager();
-        eligibleRecipients[newGroup] = RecipientsManager();
-        registeredRecipients[newGroup] = RecipientsManager();
-
-        emit EventStarted();
+        emit GroupCreated(msg.sender, newGroupId);
     }
 
     function startEvent(uint256 groupId)
@@ -98,10 +98,10 @@ contract AdminsManager is ContributorManager {
         onlyAdmins(groupId)
         whenNotPaused
     {
-        currentEvents[groupId].state = EventState.REGISTRATION;
+        currentEvents[groupId].currentState = EventState.REGISTRATION;
         currentEvents[groupId].startTime = block.timestamp;
 
-        emit EventStarted();
+        emit EventStarted(msg.sender, groupId);
     }
 
     function closeEventRegistration(uint256 groupId)
@@ -112,20 +112,23 @@ contract AdminsManager is ContributorManager {
         currentEvents[groupId].registrationEndTime = block.timestamp;
 
         // Transfer dev cut to cfo
-        payable(cfoAddress).transfer(address(this).balance * 0.05);
+        payable(cfoAddress).transfer(
+            (address(this).balance * devCutPercentage) / 100
+        );
 
-        uint256 potShares = [];
+        uint256[] memory potShares = new uint256[](
+            currentEvents[groupId].registeredRecipientsCount
+        );
 
         for (
             uint256 i;
             i < currentEvents[groupId].registeredRecipientsCount;
             i++
         ) {
-            potShares.push(1);
+            potShares[i] = 1;
         }
 
-        // Build pot
-        PaymentSplitter pot = PaymentSplitter(
+        pot[groupId] = new PaymentSplitter(
             registeredRecipientsArray[groupId],
             potShares
         );
@@ -133,14 +136,14 @@ contract AdminsManager is ContributorManager {
         currentEvents[groupId].currentState = EventState.CLAIM_WINNINGS;
 
         uint256 winningsPerRecipient = address(this).balance /
-            pot.totalShares();
+            pot[groupId].totalShares();
 
         emit CalculatedPot(
             currentEvents[groupId].registeredRecipientsCount,
             winningsPerRecipient
         );
 
-        emit RegistrationEnded();
+        emit RegistrationEnded(msg.sender, groupId);
     }
 
     function endEvent(uint256 groupId)
@@ -154,7 +157,7 @@ contract AdminsManager is ContributorManager {
 
         pastEvents[groupId].push(currentEvents[groupId]);
 
-        emit EventEnded();
+        emit EventEnded(msg.sender, groupId);
     }
 
     function addEligibleRecipient(address account, uint256 groupId)
@@ -162,7 +165,7 @@ contract AdminsManager is ContributorManager {
         whenNotPaused
         onlyAdmins(groupId)
     {
-        eligibleRecipients[groupId].add(account);
+        eligibleRecipients[groupId][account] = true;
         emit EligibleRecipientAdded(account, groupId);
     }
 
@@ -171,7 +174,7 @@ contract AdminsManager is ContributorManager {
         onlyAdmins(groupId)
         whenNotPaused
     {
-        eligibleRecipients[groupId].remove(account);
+        eligibleRecipients[groupId][account] = false;
         emit EligibleRecipientRemoved(account, groupId);
     }
 

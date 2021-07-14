@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+ pragma solidity ^0.8.0;
 
 import "./RecipientsManager.sol";
 import "./Roles.sol";
@@ -7,32 +7,32 @@ import "./Roles.sol";
 contract ContributorManager is RecipientsManager {
     using Roles for Roles.Role;
 
-    event ContributorAdded(address indexed account, uint256 groupId);
-    event ContributorRemoved(address indexed account, uint256 groupId);
+    event ContributorAdded(address indexed account, uint groupId);
+    event ContributorRemoved(address indexed account, uint groupId);
 
     event ContributionMade(
         address indexed account,
-        uint256 groupId,
-        uint256 amount
+        uint groupId,
+        uint amount
     );
 
     constructor() {}
 
-    modifier onlyContributor(uint256 groupId) {
+    modifier onlyContributor(uint groupId) {
         require(isContributor(msg.sender, groupId));
         _;
     }
 
-    function isContributor(address account, uint256 groupId)
+    function isContributor(address account, uint groupId)
         public
         view
         whenNotPaused
         returns (bool)
     {
-        return currentEvents[groupId].contributors.has(account);
+        return contributors[groupId][account] == true;
     }
 
-    function renounceContributor(uint256 groupId)
+    function renounceContributor(uint groupId)
         public
         onlyContributor(groupId)
         whenNotPaused
@@ -40,17 +40,17 @@ contract ContributorManager is RecipientsManager {
         _removeContributor(msg.sender, groupId);
     }
 
-    function _addContributor(address account, uint256 groupId) internal {
-        currentEvents[groupId].admins.add(account);
+    function _addContributor(address account, uint groupId) internal {
+        contributors[groupId][account] = true;
         emit ContributorAdded(account, groupId);
     }
 
-    function _removeContributor(address account, uint256 groupId) internal {
-        currentEvents[groupId].admins.remove(account);
+    function _removeContributor(address account, uint groupId) internal {
+        contributors[groupId][account] = false;
         emit ContributorRemoved(account, groupId);
     }
 
-    function contributeToPot(uint256 groupId)
+    function contributeToPot(uint groupId)
         public
         payable
         onlyContributor(groupId)

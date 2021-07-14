@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity ^0.8.0;
 
 import "../roles/Roles.sol";
 import "../roles/ExecutivesAccessControl.sol";
@@ -24,7 +24,7 @@ contract CrowdDropBase is ExecutivesAccessControl {
     event Transfer(address from, address to); // Assumed Eth
 
     // TODO - (in later, more than just eth contracts as pass tokenId)
-    // event Transfer(address from, address to, uint256 tokenId);
+    // event Transfer(address from, address to, uint tokenId);
 
     /*** DATA TYPES ***/
 
@@ -36,70 +36,69 @@ contract CrowdDropBase is ExecutivesAccessControl {
 
     // TODO - ^ think harder about all that byte-packing junk... 😅
 
-    enum EventState { CREATED, REGISTRATION, CLAIM_WINNINGS, ENDED }
+    enum EventState {
+        CREATED,
+        REGISTRATION,
+        CLAIM_WINNINGS,
+        ENDED
+    }
+
+    uint devCutPercentage = 5;
 
     struct CrowdDropEvent {
-        
         // The IRL organization that controls their own airdrops.
         // Each group can only be running 1 event at a time.
-        uint256 groupId;
-
+        uint groupId;
         // Event goes through a linear flow of states, finite state machine.
         EventState currentState;
-
         // The timestamp from the block when this event started.
-        uint64 startTime;
+        uint startTime;
         // The timestamp from the block when registration for this event ended.
-        uint64 registrationEndTime;
+        uint registrationEndTime;
         // The timestamp from the block when this event ended.
-        uint64 endTime;
-        
+        uint endTime;
         // The number of eligibleRecipients who have registered.
         uint registeredRecipientsCount;
-        
         // Data about the sponsor info (address is stored in Roles)
         string sponsorName;
         string sponsorImageUrl;
         string sponsorLinkToUrl;
-
         address currentContributor;
-
-        // Keeping track of winnings claimings
-        PaymentSplitter pot;
-
     }
 
     // ALL events happening now or in the future.
     // Key is the groupId
     mapping(uint => CrowdDropEvent) currentEvents;
-    
+
     // ALL events that have already happened.
     // Key is the groupId
     mapping(uint => CrowdDropEvent[]) pastEvents;
 
     // Holds ALL admins for all groups
-    // groupId => Role 
-    mapping(uint => Roles.Role) admins;
+    // groupId => Role
+    mapping(uint => mapping(address => bool)) admins;
 
     // Holds ALL contributors for all groups
-    // groupId => Role 
-    mapping(uint => Roles.Role) contributors;
+    // groupId => Role
+    mapping(uint => mapping(address => bool)) contributors;
 
     // Holds ALL eligibleRecipients for all groups
-    // groupId => Role 
-    mapping(uint => Roles.Role) eligibleRecipients;
+    // groupId => Role
+    mapping(uint => mapping(address => bool)) eligibleRecipients;
 
     // Holds ALL registeredRecipients for all groups
-    // groupId => Role 
-    mapping(uint => Roles.Role) registeredRecipients;
+    // groupId => Role
+    mapping(uint => mapping(address => bool)) registeredRecipients;
 
     // Holds ALL registeredRecipients in an array (for PaymentSplitter)
-    // groupId => address[] 
+    // groupId => address[]
     mapping(uint => address[]) registeredRecipientsArray;
 
+    // Keeping track of winnings for all groups
+    mapping(uint => PaymentSplitter) pot;
 
     // Any C-level can fix how many seconds per blocks are currently observed.
-    // function setSecondsPerBlock(uint256 secs) external onlyCLevel {
+    // function setSecondsPerBlock(uint secs) external onlyCLevel {
     //     require(secs < cooldowns[0]);
     //     secondsPerBlock = secs;
     // }
