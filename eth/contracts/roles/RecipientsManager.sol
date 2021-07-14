@@ -2,10 +2,8 @@
  pragma solidity ^0.8.0;
 
 import "../core/CrowdDropBase.sol";
-import "./Roles.sol";
 
 contract RecipientsManager is CrowdDropBase {
-    using Roles for Roles.Role;
 
     event EligibleRecipientAdded(address indexed account, uint groupId);
     event EligibleRecipientRemoved(address indexed account, uint groupId);

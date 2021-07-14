@@ -1,3 +1,5 @@
-module.exports = function(_deployer) {
-  // Use deployer to state migration tasks.
+const ExecutivesAccessControl = artifacts.require("ExecutivesAccessControl");
+
+module.exports = function (deployer) {
+  deployer.deploy(ExecutivesAccessControl);
 };

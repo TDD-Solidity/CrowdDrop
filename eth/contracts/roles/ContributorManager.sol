@@ -2,10 +2,8 @@
  pragma solidity ^0.8.0;
 
 import "./RecipientsManager.sol";
-import "./Roles.sol";
 
 contract ContributorManager is RecipientsManager {
-    using Roles for Roles.Role;
 
     event ContributorAdded(address indexed account, uint groupId);
     event ContributorRemoved(address indexed account, uint groupId);

@@ -1,5 +1,5 @@
-const CrowdDropCore_Eth = artifacts.require("CrowdDropCore_Eth");
+const CrowdDropCore = artifacts.require("CrowdDropCore");
 
 module.exports = function (deployer) {
-  deployer.deploy(CrowdDropCore_Eth);
+  deployer.deploy(CrowdDropCore);
 };

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../roles/Roles.sol";
 import "../roles/ExecutivesAccessControl.sol";
 import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
 

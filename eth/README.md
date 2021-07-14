@@ -60,20 +60,56 @@ Here is the full inheritance chain. It all starts with "ExecutivesAccessControl"
 <br/>
 <br/>
 
+## Dev Stuff
+
+_Note: The following guides make heavy usage of [node](https://nodejs.org) (preferably v14) and [truffle](https://www.trufflesuite.com) so be sure to have them installed!
+
+
 ## Remix Usage Guide
 
-Here's a short guide on how to deploy this contract and play with it on remix!
+Here's a short guide on how to deploy this contract and play with it on [remix](https://remix.ethereum.org)!
 
 <br/>
 
-### Step 1 - Create a build from the source code.
+### Step 1 - Create A Build From The Source Code.
 
 cd into the "eth" folder of this repo.
 
+Install dependencies fresh:
+```
+rm -rf node_modules & npm i
+```
+
 Then run:
 ```
-
+truffle build
 ```
 
 
-### Step 1 - Deploy to your desired Testnet
+### Step 2 - Deploy To Your Desired Testnet
+
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+_but wait, there's more..._
+<br/>
+Want to contribute or build on top of this project? Read on for the local development setup guide!
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+## Local Dev Guide
+
+Navigate into `eth` directory. 
+
+Install dependecnies:
+```
+npm i
+```

@@ -1,5 +1,5 @@
-const ContributorManager = artifacts.require("ContributorManager");
+const RecipientsManager = artifacts.require("RecipientsManager");
 
 module.exports = function (deployer) {
-  deployer.deploy(ContributorManager);
+  deployer.deploy(RecipientsManager);
 };

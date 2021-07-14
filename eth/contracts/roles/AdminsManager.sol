@@ -2,10 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "./ContributorManager.sol";
-import "./Roles.sol";
 
 contract AdminsManager is ContributorManager {
-    using Roles for Roles.Role;
 
     event AdminAdded(address indexed account, uint256 groupId);
     event AdminRemoved(address indexed account, uint256 groupId);

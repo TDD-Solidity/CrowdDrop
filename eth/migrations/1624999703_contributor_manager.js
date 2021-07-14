@@ -1,3 +1,6 @@
-module.exports = function(_deployer) {
-  // Use deployer to state migration tasks.
+const ContributorManager = artifacts.require("ContributorManager");
+
+module.exports = function (deployer) {
+  deployer.deploy(ContributorManager);
 };
+
