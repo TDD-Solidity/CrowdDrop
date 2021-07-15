@@ -86,6 +86,10 @@ truffle build
 ```
 
 
+
+
+
+
 ### Step 2 - Deploy To Your Desired Testnet
 
 
@@ -112,4 +116,39 @@ Navigate into `eth` directory.
 Install dependecnies:
 ```
 npm i
+```
+
+<br/>
+_Note: See the "scripts" sections of the `package.json` file to see what commands these scripts are running under the hood._ 
+
+
+<br/>
+To run on a local blockchain:
+```
+npm start
+```
+
+Then in the new promt that appears, migrate your contracts:
+```
+migrate
+```
+
+To run unit tests:
+```
+npm run test
+```
+
+To run unit tests in watch mode 
+```
+nom run test:watch
+```
+
+To run linting:
+```
+truffle test
+```
+
+Solhint linting:
+```
+npm run lint
 ```

@@ -4,7 +4,13 @@
   "description": "A simple airdrop smart contract",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "truffle develop",
+    "build": "truffle build",
+    "test": "truffle test",
+    "test:watch": "nodemon --ext 'js,sol' --exec 'truffle test'",
+    "test:cov": "truffle run coverage",
+    "lint": "solhint -f table contracts/**/*.sol",
+    "deploy:rinkeby": "truffle compile && truffle migrate --network rinkeby"
   },
   "repository": {
     "type": "git",
@@ -18,6 +24,12 @@
   "homepage": "https://github.com/TDD-Solidity/CrowdDrop#readme",
   "dependencies": {
     "@openzeppelin/contracts": "^4.2.0",
-    "nodemon": "^2.0.12"
+    "dotenv": "^10.0.0",
+    "truffle-hdwallet-provider": "^1.0.17"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12",
+    "solhint": "^3.3.6",
+    "solidity-coverage": "^0.7.16"
   }
 }
