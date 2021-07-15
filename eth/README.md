@@ -92,6 +92,29 @@ truffle build
 
 ### Step 2 - Deploy To Your Desired Testnet
 
+Make an account on infura.com
+
+Run this command to call to our smart contract!
+
+(Note: replace "method" and "parameters" as needed)
+
+```
+curl https://mainnet.infura.io/v3/YOUR-PROJECT-ID \
+-X POST \
+-H "Content-Type: application/json" \
+-d '{"jsonrpc":"2.0","method":"eth_getBalance","params": ["0xBf4eD7b27F1d666546E30D74d50d173d20bca754", "latest"],"id":1}'
+```
+
+https://rinkeby.infura.io/v3/2fad09ea5c184cff844b1467c8616d6b \
+-X POST \
+-H "Content-Type: application/json" \
+-d '{"jsonrpc":"2.0","method":"setCFO","params": ["0xe8f9A288554FAAbBAca8c6946bF2E3A07B685c12", "latest"],"id":1}'
+
+
+curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc": "2.0", "id": 1, "method": "eth_blockNumber", "params": []}' https://rinkeby.infura.io/v3/2fad09ea5c184cff844b1467c8616d6b
+
+curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc": "2.0", "id": 1, "method": "setCFO", "params": [0xe8f9A288554FAAbBAca8c6946bF2E3A07B685c12]}' https://rinkeby.infura.io/v3/2fad09ea5c184cff844b1467c8616d6b
+
 
 <br/>
 <br/>
@@ -128,7 +151,7 @@ To run on a local blockchain:
 npm start
 ```
 
-Then in the new promt that appears, migrate your contracts:
+Then in the new prompt that appears, migrate your contracts:
 ```
 migrate
 ```
