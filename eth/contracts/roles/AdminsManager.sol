@@ -39,11 +39,11 @@ contract AdminsManager is ContributorManager {
     }
 
     // TODO - allow COO to give "admin-granting power" to other admins
-    function addAdmin(address account, uint256 groupId) public onlyCOO {
+    function addAdmin(address account, uint256 groupId) external onlyCOO {
         _addAdmin(account, groupId);
     }
 
-    function removeAdmin(address account, uint256 groupId) public onlyCOO {
+    function removeAdmin(address account, uint256 groupId) external onlyCOO {
         _removeAdmin(account, groupId);
     }
 
@@ -62,7 +62,7 @@ contract AdminsManager is ContributorManager {
     }
 
     function readEventInfo(uint256 groupId)
-        public
+        external
         view
         onlyAdmins(groupId)
         returns (CrowdDropEvent memory)
@@ -70,7 +70,7 @@ contract AdminsManager is ContributorManager {
         return currentEvents[groupId];
     }
 
-    function createNewGroup() public onlyCOO whenNotPaused {
+    function createNewGroup() external onlyCOO whenNotPaused {
         uint256 newGroupId = uint256(blockhash(block.number));
 
         CrowdDropEvent memory newGroup = CrowdDropEvent(
@@ -92,7 +92,7 @@ contract AdminsManager is ContributorManager {
     }
 
     function startEvent(uint256 groupId)
-        public
+        external
         onlyAdmins(groupId)
         whenNotPaused
     {
@@ -103,7 +103,7 @@ contract AdminsManager is ContributorManager {
     }
 
     function closeEventRegistration(uint256 groupId)
-        public
+        external
         onlyAdmins(groupId)
         whenNotPaused
     {
@@ -145,7 +145,7 @@ contract AdminsManager is ContributorManager {
     }
 
     function endEvent(uint256 groupId)
-        public
+        external
         onlyAdminsOrCOO(groupId)
         whenNotPaused
     {
@@ -159,7 +159,7 @@ contract AdminsManager is ContributorManager {
     }
 
     function addEligibleRecipient(address account, uint256 groupId)
-        public
+        external
         whenNotPaused
         onlyAdmins(groupId)
     {
@@ -168,7 +168,7 @@ contract AdminsManager is ContributorManager {
     }
 
     function removeEligibleRecipient(address account, uint256 groupId)
-        public
+        external
         onlyAdmins(groupId)
         whenNotPaused
     {
@@ -177,7 +177,7 @@ contract AdminsManager is ContributorManager {
     }
 
     function addContributor(address account, uint256 groupId)
-        public
+        external
         onlyAdminsOrCOO(groupId)
         whenNotPaused
     {
@@ -185,7 +185,7 @@ contract AdminsManager is ContributorManager {
     }
 
     function removeContributor(address account, uint256 groupId)
-        public
+        external
         onlyAdminsOrCOO(groupId)
         whenNotPaused
     {

@@ -96,9 +96,4 @@ contract CrowdDropBase is ExecutivesAccessControl {
     // Keeping track of winnings for all groups
     mapping(uint => PaymentSplitter) pot;
 
-    // Any C-level can fix how many seconds per blocks are currently observed.
-    // function setSecondsPerBlock(uint secs) external onlyCLevel {
-    //     require(secs < cooldowns[0]);
-    //     secondsPerBlock = secs;
-    // }
 }

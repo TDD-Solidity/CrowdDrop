@@ -42,7 +42,7 @@ contract RecipientsManager is CrowdDropBase {
     }
 
     function registerForEvent(uint groupId)
-        public
+        external
         onlyEligibleRecipients(groupId)
         whenNotPaused
     {
@@ -55,7 +55,7 @@ contract RecipientsManager is CrowdDropBase {
     }
 
     function claimWinnings(uint groupId)
-        public
+        external
         onlyRegisteredRecipients(groupId)
         whenNotPaused
     {

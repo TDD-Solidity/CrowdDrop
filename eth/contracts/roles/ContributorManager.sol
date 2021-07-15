@@ -31,7 +31,7 @@ contract ContributorManager is RecipientsManager {
     }
 
     function renounceContributor(uint groupId)
-        public
+        external
         onlyContributor(groupId)
         whenNotPaused
     {
@@ -49,7 +49,7 @@ contract ContributorManager is RecipientsManager {
     }
 
     function contributeToPot(uint groupId)
-        public
+        external
         payable
         onlyContributor(groupId)
         whenNotPaused
